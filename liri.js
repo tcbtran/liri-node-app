@@ -37,12 +37,10 @@ switch (command) {
 function tweet() {
   // User based authentication
   var Twitter = require('twitter');
-  var client = new Twitter({
-    consumer_key: tweetKeys.consumer_key,
-    consumer_secret: tweetKeys.consumer_secret,
-    access_token_key: tweetKeys.access_token_key,
-    access_token_secret: tweetKeys.access_token_secret
-  });
+
+  // since you've already named your twitter keys the same as what the Twitter client expects
+  // you can simply pass those in instead of redundantly naming them.
+  var client = new Twitter(tweetKeys)
 
   var params = { screen_name: 'tcbtran23', count: 20};
   client.get('statuses/user_timeline', params, function(error, tweets, response) {
@@ -60,7 +58,8 @@ function tweet() {
 
 // spotify() function calling Spotify API
 function spotify() {
-  
+  // doesn't make a functional difference, but it's common place to define all your dependencies
+  // at the top of the file as opposed to right before you use them.
   var spotify = require('spotify');
   var nodeArgs = process.argv;
   var song = "";
@@ -77,11 +76,15 @@ function spotify() {
       console.log(data.tracks.items.length + " results were found"); // Number of results found
 
       for (var j=0; j < data.tracks.items.length; j++) {
-      console.log("**********************************************************");
-      console.log("Artist: " + data.tracks.items[j].album.artists[0].name);
-      console.log("Song Title: " + data.tracks.items[j].name); // Title of the song
-      console.log("Album: " + data.tracks.items[j].album.name);
-      console.log("Spotify preview link: " + data.tracks.items[j].preview_url);  // Quick preview URL
+        // when you find yourself accessing such a deeply nested piece of data
+        // you can go ahead and assign it to a variable for the sake of readability
+        var track = data.tracks.items[j]
+        // It may seem silly, but consistent indentation makes parsing your code considerably easier
+        console.log("**********************************************************");
+        console.log("Artist: " + track.album.artists[0].name);
+        console.log("Song Title: " + track.name); // Title of the song
+        console.log("Album: " + track.album.name);
+        console.log("Spotify preview link: " + track.preview_url);  // Quick preview URL
       }
 
     }
@@ -112,14 +115,18 @@ function movie() {
       console.log(err);
     }
     else {
-      console.log("Movie Title: " + JSON.parse(body).Title);
-      console.log("Released: " + JSON.parse(body).Year);
-      console.log("IMDB Rating: " + JSON.parse(body).imdbRating);
-      console.log("Produced in: " + JSON.parse(body).Country);
-      console.log("Language(s): " + JSON.parse(body).Language);
-      console.log("Plot: " + JSON.parse(body).Plot);
-      console.log("Actors: " + JSON.parse(body).Actors);
-      console.log("Website: " + JSON.parse(body).Website);
+      // Instead of repeatedly parsing the body, you can simply redefine the body as it's parsed result
+      // and then you can save yourself a few key strokes and a few computing cycles
+      body = JSON.parse(body)
+
+      console.log("Movie Title: " + body.Title);
+      console.log("Released: " + body.Year);
+      console.log("IMDB Rating: " + body.imdbRating);
+      console.log("Produced in: " + body.Country);
+      console.log("Language(s): " + body.Language);
+      console.log("Plot: " + body.Plot);
+      console.log("Actors: " + body.Actors);
+      console.log("Website: " + body.Website);
     }
   });
 
@@ -134,7 +141,11 @@ function random() {
     data = data.split(',');
     console.log(data);
 
-  
+    // if you encapsulated the switch command from the top of the file into
+    // a function and you modified your spotify and movie functions to take in 
+    // the song or movie to search for as an argument, then you could simply
+    // call the function containing the switch command here with the command
+    // from the random file as well as the string to search for.
 
   });
 
